@@ -1,7 +1,65 @@
 import Navbar from "../../components/navbar/navbar";
 import "./checkout.css"
+import { CartContext } from "../../components/contexts/contexto-carrinho";
+import { useContext, useState} from "react";
+import { useNavigate } from "react-router-dom";
+import api from "../../services/api";
 
 function Checkout(){
+    
+    const {totalCarrinho, carrinhoItens, setCarrinhoItens, setTotalCarrinho} = useContext(CartContext); 
+
+    const navigate = useNavigate();
+
+    const [nome, setNome] = useState("");
+    const [email, setEmail] = useState("");
+    const [fone, setFone] = useState("");
+
+    const [cep, setCep] = useState("");
+    const [endereco, setEndereco] = useState("");
+    const [bairro, setBairro] = useState("");
+    const [cidade, setCidade] = useState("");
+    const [uf, setUF] = useState("");
+
+    function FinalizarPedido(){
+
+        //Monta itens para enviar para a API...
+        let produtos = [];
+
+        for(var prod of carrinhoItens){
+            produtos.push({
+                id_produto: prod.id,
+                qtd: prod.qtd,
+                vl_unitario: prod.preco,
+                vl_total: prod.preco * prod.qtd
+            });
+        }
+        
+        const params = {
+            id_usuario: 1,
+            nome,
+            email,
+            fone,
+            endereco,
+            bairro,
+            cidade,
+            uf,
+            cep,
+            total: totalCarrinho,
+            itens: produtos
+        }
+
+        api.post("/pedidos", params)
+        .then(function(resp){
+            setCarrinhoItens([]);
+            setTotalCarrinho(0);
+            navigate('/historico');
+        })
+        .catch(function(err){
+            alert('Erro ao enviar pedido.')
+        })
+    }
+
     return <>
     <Navbar/>
 
@@ -16,17 +74,17 @@ function Checkout(){
 
                 <div className="input-group">
                     <p>Nome Completo</p>
-                    <input type="text" id="nome"/>
+                    <input type="text" id="nome" onChange={function(e){setNome(e.target.value)}}/>
                 </div>
 
                 <div className="input-group">
                     <p>E-mail</p>
-                    <input type="text" id="email"/>
+                    <input type="text" id="email" onChange={function(e){setEmail(e.target.value)}}/>
                 </div>
 
                 <div className="input-group">
                     <p>Telefone Contato</p>
-                    <input type="text" id="tel"/>
+                    <input type="text" id="tel" onChange={function(e){setFone(e.target.value)}}/>
                 </div>
             </div>
         </div>
@@ -37,27 +95,27 @@ function Checkout(){
 
                 <div className="input-group">
                     <p>CEP</p>
-                    <input type="text" id="cep"/>
+                    <input type="text" id="cep" onChange={function(e){setCep(e.target.value)}}/>
                 </div>
 
                 <div className="input-group">
                     <p>Endereço</p>
-                    <input type="text" id="endereco"/>
+                    <input type="text" id="endereco" onChange={function(e){setEndereco(e.target.value)}}/>
                 </div>
 
                 <div className="input-group">
                     <p>Bairro</p>
-                    <input type="text" id="bairro"/>
+                    <input type="text" id="bairro" onChange={function(e){setBairro(e.target.value)}}/>
                 </div>
 
                 <div className="input-group">
                     <p>Cidade</p>
-                    <input type="text" id="cidade"/>
+                    <input type="text" id="cidade" onChange={function(e){setCidade(e.target.value)}}/>
                 </div>
 
                 <div className="input-group">
                     <p>UF</p>
-                    <select id="uf">
+                    <select id="uf" onChange={function(e){setUF(e.target.value)}}>
                     <option value="AC">Acre</option>
                     <option value="AL">Alagoas</option>
                     <option value="AP">Amapá</option>
@@ -97,11 +155,11 @@ function Checkout(){
 
                 <div className="checkout-valores">
                     <span>Total</span>
-                    <span><strong>R$ 50,00</strong></span>
+                    <span><strong>{new Intl.NumberFormat('pt-BR', {style: 'currency', currency: "BRL"}).format(totalCarrinho)}</strong></span>
                 </div>
 
                 <div className="checkout-button">
-                    <button className="btn-checkout">Finalizar Pedido</button>
+                    <button onClick={FinalizarPedido} className="btn-checkout">Finalizar Pedido</button>
                 </div>
             </div>
         </div>

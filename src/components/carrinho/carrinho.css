@@ -16,3 +16,11 @@
     height: calc(100% - 230px);
     overflow: auto;
 }
+
+.cart-btn-close{
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    width: 32px;
+    cursor: pointer;
+}

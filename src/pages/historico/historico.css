@@ -3,3 +3,11 @@
     padding: 40px;
     border-radius: 20px;
 }
+
+@media screen and (max-width: 700px){
+
+    .box-pedidos{
+        font-size: 0.7rem;
+        padding: 0px;
+    }
+}

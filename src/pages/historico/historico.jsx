@@ -1,7 +1,22 @@
+import { useEffect, useState } from "react";
 import Navbar from "../../components/navbar/navbar.jsx";
 import "./historico.css"
+//import {pedidos} from "../../dados.js"
+import api from "../../services/api.js";
 
 function Historico(){
+
+    const [pedidos, setPedidos] = useState([]);
+
+    useEffect(function(){
+        api.get("/pedidos")
+        .then(function(resp){
+            setPedidos(resp.data);
+        })
+        .catch(function(err){
+            alert('Erro ao carregar produtos');
+        })
+    }, []);
 
     return <>
         <Navbar showMenu={true}/>
@@ -13,29 +28,15 @@ function Historico(){
 
             <div className="box-pedidos">
                 <table>
-                    <tr>
-                        <td><strong>Pedido 321321</strong></td>
-                        <td className="text-light">14/01/2024</td>
-                        <td className="text-red">R$ 500,00</td>
-                    </tr>
-
-                    <tr>
-                        <td><strong>Pedido 321322</strong></td>
-                        <td className="text-light">14/01/2024</td>
-                        <td className="text-red">R$ 500,00</td>
-                    </tr>
-
-                    <tr>
-                        <td><strong>Pedido 321323</strong></td>
-                        <td className="text-light">14/01/2024</td>
-                        <td className="text-red">R$ 500,00</td>
-                    </tr>
-
-                    <tr>
-                        <td><strong>Pedido 321324</strong></td>
-                        <td className="text-light">14/01/2024</td>
-                        <td className="text-red">R$ 500,00</td>
-                    </tr>
+                    {
+                        pedidos.map(function(ped){
+                            return  <tr key={ped.id_pedido }>
+                                    <td><strong>Pedido {ped.id_pedido}</strong></td>
+                                    <td className="text-light">{ped.dt_pedido}</td>
+                                    <td className="text-red">{new Intl.NumberFormat('pt-BR', {style: 'currency', currency: "BRL"}).format(ped.total)}</td>
+                                </tr>
+                        })
+                    }
                 </table>
             </div>
 
